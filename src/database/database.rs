@@ -21,11 +21,11 @@ use mongodb::
 } */
 
 #[allow(dead_code)]
-pub struct Users {
+pub struct Service {
   collection: Collection<User>,
 }
 
-impl Users {
+impl Service {
   pub fn init() -> Self {
     dotenv().ok();
   

@@ -1,16 +1,15 @@
 #[macro_use] extern crate rocket;
 
-mod services;
 mod database;
 mod models;
 mod controllers;
 
-use database::Users;
+use database::Service;
 
 #[launch]
 fn rocket() -> _ {
 
-  let connection_of_database = Users::init();
+  let connection_of_database = Service::init();
 
   rocket::build()
     .manage(connection_of_database)
@@ -22,8 +21,11 @@ fn rocket() -> _ {
         controllers::default::get_home,
 
         // users
-        controllers::users::create_user,
-        controllers::users::get_all_users,
+        controllers::users::new,
+        controllers::users::update,
+        controllers::users::delete,
+        controllers::users::find_all,
+        controllers::users::find_one,
       ]   
     )
 }
