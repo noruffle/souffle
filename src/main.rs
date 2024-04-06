@@ -7,8 +7,8 @@ mod controllers;
 use database::Service;
 
 #[launch]
-fn rocket() -> _ {
-
+fn rocket() -> _ 
+{
   let connection_of_database = Service::init();
 
   rocket::build()

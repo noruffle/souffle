@@ -1,7 +1,5 @@
 extern crate dotenv;
-
 use crate::models::User;
-
 use std::env;
 use dotenv::dotenv;
 use mongodb::
@@ -11,22 +9,13 @@ use mongodb::
   sync::{Client, Collection}
 };
 
-/* pub trait Database {
-  fn init() -> Self;
-  fn create(&self, ctx: User) -> Result<InsertOneResult, Error>;
-  fn get(&self, ctx: &String) -> Result<User, Error>;
-  fn get_all(&self) -> Result<Vec<User>, Error>;
-  fn update(&self, id: &String, new_user: User) -> Result<UpdateResult, Error>;
-  fn delete(&self, id: &String) -> Result<DeleteResult, Error>; 
-} */
-
-#[allow(dead_code)]
 pub struct Service {
   collection: Collection<User>,
 }
 
 impl Service {
-  pub fn init() -> Self {
+  pub fn init() -> Self 
+  {
     dotenv().ok();
   
     let uri = match env::var("URI") {
@@ -40,13 +29,15 @@ impl Service {
     Self { collection }   
   }
   
-  pub fn create(&self, new_user: User) -> Result<InsertOneResult, Error>  {
+  pub fn create(&self, new_user: User) -> Result<InsertOneResult, Error>
+  {
     let new_doc = User {
       id: None,
       name: new_user.name,
       email: new_user.email,
       password: new_user.password,
-  };
+    };
+
     let user = self
       .collection
       .insert_one(new_doc, None)
@@ -56,18 +47,20 @@ impl Service {
     Ok(user)
   }
   
-  pub fn get(&self, id: &String) -> Result<User, Error> {
+  pub fn get(&self, id: &String) -> Result<User, Error>
+  {
     let obj_id = ObjectId::parse_str(id).unwrap();
-      let filter = doc! {"_id": obj_id};
-      let user_detail = self
-          .collection
-          .find_one(filter, None)
-          .ok()
-          .expect("Error getting user's detail");
-      Ok(user_detail.unwrap())
+    let filter = doc! {"_id": obj_id};
+    let user_detail = self
+      .collection
+      .find_one(filter, None)
+      .ok()
+      .expect("Error getting user's detail");
+    Ok(user_detail.unwrap())
   }
 
-  pub fn get_all(&self) -> Result<Vec<User>, Error> {
+  pub fn get_all(&self) -> Result<Vec<User>, Error> 
+  {
     let cursors = self
       .collection
       .find(None, None)
@@ -78,7 +71,8 @@ impl Service {
     Ok(users)
   }
   
-  pub fn update(&self, id: &String, new_user: User) -> Result<UpdateResult, Error> {
+  pub fn update(&self, id: &String, new_user: User) -> Result<UpdateResult, Error>
+  {
     let obj_id = ObjectId::parse_str(id).unwrap();
     let filter = doc! {"_id": obj_id};
     let new_doc = doc! {
@@ -92,14 +86,16 @@ impl Service {
     };
 
     let updated_doc = self
-        .collection
-        .update_one(filter, new_doc, None)
-        .ok()
-        .expect("Error updating user");
+      .collection
+      .update_one(filter, new_doc, None)
+      .ok()
+      .expect("Error updating user");
+    
     Ok(updated_doc)
   }
   
-  pub fn delete(&self, id: &String) -> Result<DeleteResult, Error> {
+  pub fn delete(&self, id: &String) -> Result<DeleteResult, Error>
+  {
     let obj_id = ObjectId::parse_str(id).unwrap();
     let filter = doc! {"_id": obj_id};
     let user_detail = self
