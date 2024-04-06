@@ -29,28 +29,29 @@ impl Users {
   pub fn init() -> Self {
     dotenv().ok();
   
-    let uri = match env::var("MONGO_URI") {
-      Ok(value) => value.to_string(),
+    let uri = match env::var("URI") {
+      Ok(value) => {value.to_string()},
       Err(_) => format!("Error loading env variable.")
     };
-  
     let client = Client::with_uri_str(uri).unwrap();
-    let database = client.database("Database");
-    let collection = database.collection("User");
+    let database = client.database("database");
+    let collection = database.collection("users");
   
     Self { collection }   
   }
   
-  pub fn create(&self, ctx: User) -> Result<InsertOneResult, Error> {
-    let new = User {
+  pub fn create(&self, new_user: User) -> Result<InsertOneResult, Error>  {
+    let new_doc = User {
       id: None,
-      name: ctx.name,
-      email: ctx.email,
-      password: ctx.password
-    };
-
-    let user = self.collection.insert_one(new, None).ok()
-      .expect("Creating user error");
+      name: new_user.name,
+      email: new_user.email,
+      password: new_user.password,
+  };
+    let user = self
+      .collection
+      .insert_one(new_doc, None)
+      .ok()
+      .expect("Error creating user");
 
     Ok(user)
   }
