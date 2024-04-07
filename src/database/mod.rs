@@ -26,7 +26,7 @@ impl Service {
     let database = client.database("database");
     let collection = database.collection("users");
   
-    Service { collection }   
+    Service { collection }
   }
   
   pub fn create(&self, new_user: User) -> Result<InsertOneResult, Error>
