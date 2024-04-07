@@ -9,7 +9,7 @@ use database::Service;
 #[launch]
 fn rocket() -> _ 
 {
-  let connection_of_database = Service::init();
+  let connection_of_database = Service::connect();
 
   rocket::build()
     .manage(connection_of_database)
