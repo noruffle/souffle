@@ -10,15 +10,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  to-do:
-    name: learning ci/cd
-    runs-on: windows-latest
-
-    steps: 
-    - uses: actions/checkout@v3
-    - working-directory: src/main
-      run: cargo run
-  
   build:
 
     runs-on: windows-latest

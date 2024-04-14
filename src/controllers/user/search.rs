@@ -1,33 +1,21 @@
-use crate::{database::Service, models::User};
-use mongodb::{bson::oid::ObjectId, results::InsertOneResult};
+use crate::services::database::search::Search;
+use crate::services::database::Database;
+use crate::models::user::User;
+
+use mongodb::bson::oid::ObjectId;
 use rocket::{http::Status, serde::json::Json, State};
 
-#[post("/user", format = "json", data = "<ctx>")]
-pub fn new(database: &State<Service>, ctx: Json<User>) -> Result<Json<InsertOneResult>, Status>
-{
-  let data = User {
-    id: None,
-    name: ctx.name.to_owned(),
-    email: ctx.email.to_owned(),
-    password: ctx.password.to_owned(),
-  };
-
-  match database.create(data) {
-    Ok(user) => Ok(Json(user)),
-    Err(_) => Err(
-      Status::BadRequest
-    )
-  }
-}
-
 #[get("/user/<query>")]
-pub fn find_one(database: &State<Service>, query: String) -> Result<Json<User>, Status>
+pub fn find_one(
+  database: &State<Database>, 
+  query: String
+) -> Result<Json<User>, Status>
 {
   let props = query;
   
   if props.is_empty() { return Err( Status::BadRequest )};
 
-  match database.get(&props) {
+  match database.find_one(&props) {
     Ok(user) => Ok(Json(user)),
     Err(_) => Err(
       Status::BadRequest
@@ -36,9 +24,11 @@ pub fn find_one(database: &State<Service>, query: String) -> Result<Json<User>, 
 }
 
 #[get("/users")]
-pub fn find_all(database: &State<Service>) -> Result<Json<Vec<User>>, Status> 
+pub fn find_all(
+  database: &State<Database>
+) -> Result<Json<Vec<User>>, Status> 
 {
-  match database.get_all() {
+  match database.find_all() {
     Ok(list_of_users) => Ok(Json(list_of_users)),
     Err(_) => Err(
       Status::BadRequest
@@ -47,7 +37,11 @@ pub fn find_all(database: &State<Service>) -> Result<Json<Vec<User>>, Status>
 }
 
 #[put("/user/<query>", data = "<ctx>")]
-pub fn update(database: &State<Service>, query: String, ctx: Json<User>) -> Result<Json<User>, Status>
+pub fn update(
+  database: &State<Database>,
+  query: String,
+  ctx: Json<User>
+) -> Result<Json<User>, Status>
 {
   let props = query;
 
@@ -63,7 +57,7 @@ pub fn update(database: &State<Service>, query: String, ctx: Json<User>) -> Resu
   match database.update(&props, data) {
     Ok(upd) => {
       if upd.matched_count == 1 {
-        return match database.get(&props) {
+        return match database.find_one(&props) {
           Ok(user) => Ok(Json(user)),
           Err(_) => Err( Status::BadRequest )
         };
@@ -76,7 +70,10 @@ pub fn update(database: &State<Service>, query: String, ctx: Json<User>) -> Resu
 }
 
 #[delete("/user/<query>")]
-pub fn delete(database: &State<Service>, query: String) -> Result<Json<&str>, Status>
+pub fn delete(
+  database: &State<Database>, 
+  query: String
+) -> Result<Json<&str>, Status>
 {
   let props = query;
   
